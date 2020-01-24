@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+// VisitOrder order visiting order
+type VisitOrder int
+
+const (
+	VisitOrderInvalid = VisitOrder(0)
+	// Visit from root to leafs nodes
+	VisitOrderTopDown = VisitOrder(1)
+	// Visit from leaf nodes to root
+	VisitOrderDownTop = VisitOrder(2)
+)
+
 // WalkFn is used when walking the tree. Takes a
 // key and value, returning if iteration should
 // be terminated.
@@ -578,16 +589,25 @@ func (t *Tree) ToMap() map[string]interface{} {
 }
 
 // VisitNodes visits all nodes one by one
-func (t *Tree) VisitNodes(n *Node, fn func(*Node) error) error {
-	err := fn(n)
-	if err != nil {
-		return fmt.Errorf("can't process node: %s", err)
+func (t *Tree) VisitNodes(n *Node, order VisitOrder, fn func(*Node) error) error {
+	if order == VisitOrderTopDown {
+		err := fn(n)
+		if err != nil {
+			return fmt.Errorf("can't process node: %s", err)
+		}
 	}
 
 	for i := range n.edges {
-		err := t.VisitNodes(n.edges[i].node, fn)
+		err := t.VisitNodes(n.edges[i].node, order, fn)
 		if err != nil {
 			return fmt.Errorf("can't traverse inner nodes: %s", err)
+		}
+	}
+
+	if order == VisitOrderDownTop {
+		err := fn(n)
+		if err != nil {
+			return fmt.Errorf("can't process node: %s", err)
 		}
 	}
 

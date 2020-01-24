@@ -369,12 +369,15 @@ func TestVisit(t *testing.T) {
 	}
 
 	var nodes, leafs int
-	err := r.VisitNodes(r.Root(), func(n *Node) error {
+	var keys []string
+	err := r.VisitNodes(r.Root(), VisitOrderTopDown, func(n *Node) error {
 		nodes++
 
 		if n.HasValue() {
 			leafs++
 		}
+
+		keys = append(keys, n.prefix)
 
 		return nil
 	})
@@ -387,6 +390,33 @@ func TestVisit(t *testing.T) {
 	}
 	if nodes != 3 {
 		t.Fatalf("invalid nodes count: %d", nodes)
+	}
+	expected := []string{
+		"",
+		"A",
+		"B",
+	}
+	if !reflect.DeepEqual(keys, expected) {
+		t.Fatalf("mis-match: %v %v", keys, expected)
+	}
+
+	keys = nil
+	err = r.VisitNodes(r.Root(), VisitOrderDownTop, func(n *Node) error {
+		keys = append(keys, n.prefix)
+
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("can't visit nodes: %s", err)
+	}
+
+	expected = []string{
+		"B",
+		"A",
+		"",
+	}
+	if !reflect.DeepEqual(keys, expected) {
+		t.Fatalf("mis-match: %v %v", keys, expected)
 	}
 }
 
