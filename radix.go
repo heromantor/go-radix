@@ -438,6 +438,42 @@ func (t *Tree) LongestPrefix(s string) (string, interface{}, bool) {
 	return s[:prefixLen], lastLeafNode.Value(), true
 }
 
+// Minimum is used to return the minimum value in the tree
+func (t *Tree) Minimum() (string, interface{}, bool) {
+	n := t.root
+	prefix := ""
+	for {
+		if n.IsLeaf() {
+			return prefix, n.leaf.val, true
+		}
+		if len(n.edges) > 0 {
+			n = n.edges[0].node
+			prefix += n.prefix
+		} else {
+			break
+		}
+	}
+	return "", nil, false
+}
+
+// Maximum is used to return the maximum value in the tree
+func (t *Tree) Maximum() (string, interface{}, bool) {
+	n := t.root
+	prefix := ""
+	for {
+		if num := len(n.edges); num > 0 {
+			n = n.edges[num-1].node
+			prefix += n.prefix
+			continue
+		}
+		if n.IsLeaf() {
+			return prefix, n.leaf.val, true
+		}
+		break
+	}
+	return "", nil, false
+}
+
 // Walk is used to walk the tree
 func (t *Tree) Walk(parent *Node, prefix string, fn WalkFn) {
 	recursiveWalk(prefix, parent, fn)

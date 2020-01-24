@@ -42,6 +42,16 @@ func TestRadix(t *testing.T) {
 		}
 	}
 
+	// Check min and max
+	outMin, _, _ := r.Minimum()
+	if outMin != min {
+		t.Fatalf("bad minimum: %v %v", outMin, min)
+	}
+	outMax, _, _ := r.Maximum()
+	if outMax != max {
+		t.Fatalf("bad maximum: %v %v", outMax, max)
+	}
+
 	for k, v := range inp {
 		out, ok := r.Delete(k)
 		if !ok {
@@ -62,16 +72,16 @@ func TestRoot(t *testing.T) {
 	if ok {
 		t.Fatalf("bad")
 	}
-	_, ok = r.Insert("", 1)
+	_, ok = r.Insert("", true)
 	if ok {
 		t.Fatalf("bad")
 	}
 	val, ok := r.Get("")
-	if !ok || val != 1 {
+	if !ok || val != true {
 		t.Fatalf("bad: %v", val)
 	}
 	val, ok = r.Delete("")
-	if !ok || val != 1 {
+	if !ok || val != true {
 		t.Fatalf("bad: %v", val)
 	}
 }
@@ -83,7 +93,7 @@ func TestDelete(t *testing.T) {
 	s := []string{"", "A", "AB"}
 
 	for _, ss := range s {
-		r.Insert(ss, 1)
+		r.Insert(ss, true)
 	}
 
 	for _, ss := range s {
@@ -113,7 +123,7 @@ func TestDeletePrefix(t *testing.T) {
 	for _, test := range cases {
 		r := New()
 		for _, ss := range test.inp {
-			r.Insert(ss, 1)
+			r.Insert(ss, true)
 		}
 
 		deleted := r.DeletePrefix(test.prefix)
@@ -146,7 +156,7 @@ func TestLongestPrefix(t *testing.T) {
 		"foozip",
 	}
 	for _, k := range keys {
-		r.Insert(k, 0)
+		r.Insert(k, nil)
 	}
 	if r.Len() != len(keys) {
 		t.Fatalf("bad len: %v %v", r.Len(), len(keys))
@@ -194,7 +204,7 @@ func TestWalkPrefix(t *testing.T) {
 		"zipzap",
 	}
 	for _, k := range keys {
-		r.Insert(k, 0)
+		r.Insert(k, nil)
 	}
 	if r.Len() != len(keys) {
 		t.Fatalf("bad len: %v %v", r.Len(), len(keys))
@@ -274,7 +284,7 @@ func TestWalkPath(t *testing.T) {
 		"zipzap",
 	}
 	for _, k := range keys {
-		r.Insert(k, 0)
+		r.Insert(k, nil)
 	}
 	if r.Len() != len(keys) {
 		t.Fatalf("bad len: %v %v", r.Len(), len(keys))
@@ -355,7 +365,7 @@ func TestVisit(t *testing.T) {
 	s := []string{"", "A", "AB"}
 
 	for _, ss := range s {
-		r.Insert(ss, 1)
+		r.Insert(ss, true)
 	}
 
 	var nodes, leafs int
