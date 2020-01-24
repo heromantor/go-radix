@@ -593,3 +593,25 @@ func (t *Tree) VisitNodes(n *Node, fn func(*Node) error) error {
 
 	return nil
 }
+
+// VisitValues visits all nodes with values
+func (t *Tree) VisitValues(parent *Node, prefix string, fn func(key string, n *Node) error) error {
+	n := parent
+	key := prefix + n.prefix
+
+	if parent.IsLeaf() {
+		err := fn(key, n)
+		if err != nil {
+			return fmt.Errorf("can't process node: %s", err)
+		}
+	}
+
+	for i := range n.edges {
+		err := t.VisitValues(n.edges[i].node, key, fn)
+		if err != nil {
+			return fmt.Errorf("can't traverse inner nodes: %s", err)
+		}
+	}
+
+	return nil
+}

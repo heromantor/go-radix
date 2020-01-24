@@ -379,7 +379,7 @@ func TestVisit(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Fatalf("can't traverse: %s", err)
+		t.Fatalf("can't visit nodes: %s", err)
 	}
 
 	if nodes != 3 {
@@ -387,5 +387,33 @@ func TestVisit(t *testing.T) {
 	}
 	if nodes != 3 {
 		t.Fatalf("invalid nodes count: %d", nodes)
+	}
+}
+
+func TestVisitValues(t *testing.T) {
+	r := New()
+
+	s := []string{"", "A", "AB"}
+
+	for _, ss := range s {
+		r.Insert(ss, true)
+	}
+
+	out := make([]string, 0)
+	err := r.VisitValues(r.Root(), "-", func(key string, n *Node) error {
+		out = append(out, key)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("can't visit values: %s", err)
+	}
+
+	expected := []string{
+		"-",
+		"-A",
+		"-AB",
+	}
+	if !reflect.DeepEqual(out, expected) {
+		t.Fatalf("mis-match: %v %v", out, expected)
 	}
 }
