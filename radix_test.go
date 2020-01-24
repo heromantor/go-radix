@@ -27,29 +27,19 @@ func TestRadix(t *testing.T) {
 		t.Fatalf("bad length: %v %v", r.Len(), len(inp))
 	}
 
-	r.Walk(func(k string, v interface{}) bool {
-		println(k)
+	r.Walk(r.Root(), "", func(k string, v interface{}) bool {
 		return false
 	})
 
 	for k, v := range inp {
 		out, ok := r.Get(k)
 		if !ok {
+			out, ok = r.Get(k)
 			t.Fatalf("missing key: %v", k)
 		}
 		if out != v {
 			t.Fatalf("value mis-match: %v %v", out, v)
 		}
-	}
-
-	// Check min and max
-	outMin, _, _ := r.Minimum()
-	if outMin != min {
-		t.Fatalf("bad minimum: %v %v", outMin, min)
-	}
-	outMax, _, _ := r.Maximum()
-	if outMax != max {
-		t.Fatalf("bad maximum: %v %v", outMax, max)
 	}
 
 	for k, v := range inp {
@@ -72,16 +62,16 @@ func TestRoot(t *testing.T) {
 	if ok {
 		t.Fatalf("bad")
 	}
-	_, ok = r.Insert("", true)
+	_, ok = r.Insert("", 1)
 	if ok {
 		t.Fatalf("bad")
 	}
 	val, ok := r.Get("")
-	if !ok || val != true {
+	if !ok || val != 1 {
 		t.Fatalf("bad: %v", val)
 	}
 	val, ok = r.Delete("")
-	if !ok || val != true {
+	if !ok || val != 1 {
 		t.Fatalf("bad: %v", val)
 	}
 }
@@ -93,7 +83,7 @@ func TestDelete(t *testing.T) {
 	s := []string{"", "A", "AB"}
 
 	for _, ss := range s {
-		r.Insert(ss, true)
+		r.Insert(ss, 1)
 	}
 
 	for _, ss := range s {
@@ -123,7 +113,7 @@ func TestDeletePrefix(t *testing.T) {
 	for _, test := range cases {
 		r := New()
 		for _, ss := range test.inp {
-			r.Insert(ss, true)
+			r.Insert(ss, 1)
 		}
 
 		deleted := r.DeletePrefix(test.prefix)
@@ -136,7 +126,7 @@ func TestDeletePrefix(t *testing.T) {
 			out = append(out, s)
 			return false
 		}
-		r.Walk(fn)
+		r.Walk(r.Root(), "", fn)
 
 		if !reflect.DeepEqual(out, test.out) {
 			t.Fatalf("mis-match: %v %v", out, test.out)
@@ -156,7 +146,7 @@ func TestLongestPrefix(t *testing.T) {
 		"foozip",
 	}
 	for _, k := range keys {
-		r.Insert(k, nil)
+		r.Insert(k, 0)
 	}
 	if r.Len() != len(keys) {
 		t.Fatalf("bad len: %v %v", r.Len(), len(keys))
@@ -172,6 +162,7 @@ func TestLongestPrefix(t *testing.T) {
 		{"fo", ""},
 		{"foo", "foo"},
 		{"foob", "foo"},
+		{"fooba", "foo"},
 		{"foobar", "foobar"},
 		{"foobarba", "foobar"},
 		{"foobarbaz", "foobarbaz"},
@@ -203,7 +194,7 @@ func TestWalkPrefix(t *testing.T) {
 		"zipzap",
 	}
 	for _, k := range keys {
-		r.Insert(k, nil)
+		r.Insert(k, 0)
 	}
 	if r.Len() != len(keys) {
 		t.Fatalf("bad len: %v %v", r.Len(), len(keys))
@@ -283,7 +274,7 @@ func TestWalkPath(t *testing.T) {
 		"zipzap",
 	}
 	for _, k := range keys {
-		r.Insert(k, nil)
+		r.Insert(k, 0)
 	}
 	if r.Len() != len(keys) {
 		t.Fatalf("bad len: %v %v", r.Len(), len(keys))
@@ -356,4 +347,35 @@ func generateUUID() string {
 		buf[6:8],
 		buf[8:10],
 		buf[10:16])
+}
+
+func TestVisit(t *testing.T) {
+	r := New()
+
+	s := []string{"", "A", "AB"}
+
+	for _, ss := range s {
+		r.Insert(ss, 1)
+	}
+
+	var nodes, leafs int
+	err := r.VisitNodes(r.Root(), func(n *Node) error {
+		nodes++
+
+		if n.IsLeaf() {
+			leafs++
+		}
+
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("can't traverse: %s", err)
+	}
+
+	if nodes != 3 {
+		t.Fatalf("invalid leafs count: %d", nodes)
+	}
+	if nodes != 3 {
+		t.Fatalf("invalid nodes count: %d", nodes)
+	}
 }
