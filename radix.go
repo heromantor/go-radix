@@ -21,19 +21,19 @@ func (l *leafNode) Value() interface{} {
 	return l.val
 }
 
-// edge is used to represent an edge node
-type edge struct {
+// Edge is used to represent an Edge node
+type Edge struct {
 	label byte
 	node  *Node
 }
 
-// Label return label for edge
-func (e *edge) Label() byte {
+// Label return label for Edge
+func (e *Edge) Label() byte {
 	return e.label
 }
 
-// Node return node which this edge connects to
-func (e *edge) Node() *Node {
+// Node return node which this Edge connects to
+func (e *Edge) Node() *Node {
 	return e.node
 }
 
@@ -70,7 +70,7 @@ func (n *Node) Value() interface{} {
 	return n.leaf.Value()
 }
 
-func (n *Node) addEdge(e edge) {
+func (n *Node) addEdge(e Edge) {
 	n.edges = append(n.edges, e)
 	n.edges.Sort()
 }
@@ -84,7 +84,7 @@ func (n *Node) updateEdge(label byte, node *Node) {
 		n.edges[idx].node = node
 		return
 	}
-	panic("replacing missing edge")
+	panic("replacing missing Edge")
 }
 
 func (n *Node) getEdge(label byte) *Node {
@@ -114,12 +114,12 @@ func (n *Node) delEdge(label byte) {
 	})
 	if idx < num && n.edges[idx].label == label {
 		copy(n.edges[idx:], n.edges[idx+1:])
-		n.edges[len(n.edges)-1] = edge{}
+		n.edges[len(n.edges)-1] = Edge{}
 		n.edges = n.edges[:len(n.edges)-1]
 	}
 }
 
-type Edges []edge
+type Edges []Edge
 
 func (e Edges) Len() int {
 	return len(e)
@@ -204,13 +204,13 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 			return nil, false
 		}
 
-		// Look for the edge
+		// Look for the Edge
 		parent = n
 		n = n.getEdge(search[0])
 
-		// No edge, create one
+		// No Edge, create one
 		if n == nil {
-			e := edge{
+			e := Edge{
 				label: search[0],
 				node: &Node{
 					leaf: &leafNode{
@@ -239,7 +239,7 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 		parent.updateEdge(search[0], child)
 
 		// Restore the existing node
-		child.addEdge(edge{
+		child.addEdge(Edge{
 			label: n.prefix[commonPrefix],
 			node:  n,
 		})
@@ -257,8 +257,8 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 			return nil, false
 		}
 
-		// Create a new edge for the node
-		child.addEdge(edge{
+		// Create a new Edge for the node
+		child.addEdge(Edge{
 			label: search[0],
 			node: &Node{
 				leaf:   leaf,
@@ -285,7 +285,7 @@ func (t *Tree) Delete(s string) (interface{}, bool) {
 			goto DELETE
 		}
 
-		// Look for an edge
+		// Look for an Edge
 		parent = n
 		label = search[0]
 		n = n.getEdge(label)
@@ -357,7 +357,7 @@ func (t *Tree) deletePrefix(parent, n *Node, prefix string) int {
 		return subTreeSize
 	}
 
-	// Look for an edge
+	// Look for an Edge
 	label := prefix[0]
 	child := n.getEdge(label)
 	if child == nil || (!strings.HasPrefix(child.prefix, prefix) && !strings.HasPrefix(prefix, child.prefix)) {
@@ -400,7 +400,7 @@ func (t *Tree) Find(parent *Node, s string) (isFound bool, prefixLen int, lastLe
 			lastLeafNode = n
 		}
 
-		// Look for an edge
+		// Look for an Edge
 		child := n.getEdge(search[0])
 		if child == nil {
 			break
@@ -493,7 +493,7 @@ func (t *Tree) WalkPrefix(prefix string, fn WalkFn) {
 
 		lcp += n.prefix
 
-		// Look for an edge
+		// Look for an Edge
 		n = n.getEdge(search[0])
 		if n == nil {
 			break
@@ -532,7 +532,7 @@ func (t *Tree) WalkPath(path string, fn WalkFn) {
 			return
 		}
 
-		// Look for an edge
+		// Look for an Edge
 		n = n.getEdge(search[0])
 		if n == nil {
 			return
