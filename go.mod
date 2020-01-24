@@ -1,3 +1,3 @@
-module github.com/heromantor/go-radix
+module github.com/armon/go-radix
 
 go 1.13
