@@ -372,7 +372,7 @@ func TestVisit(t *testing.T) {
 	err := r.VisitNodes(r.Root(), func(n *Node) error {
 		nodes++
 
-		if n.IsLeaf() {
+		if n.HasValue() {
 			leafs++
 		}
 

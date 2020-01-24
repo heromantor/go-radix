@@ -58,12 +58,12 @@ func (n *Node) Edges() Edges {
 	return n.edges
 }
 
-func (n *Node) IsLeaf() bool {
+func (n *Node) HasValue() bool {
 	return n.leaf != nil
 }
 
 func (n *Node) Value() interface{} {
-	if !n.IsLeaf() {
+	if !n.HasValue() {
 		return nil
 	}
 
@@ -191,7 +191,7 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 	for {
 		// Handle key exhaution
 		if len(search) == 0 {
-			if n.IsLeaf() {
+			if n.HasValue() {
 				old := n.leaf.val
 				n.leaf.val = v
 				return old, true
@@ -279,7 +279,7 @@ func (t *Tree) Delete(s string) (interface{}, bool) {
 	for {
 		// Check for key exhaution
 		if len(search) == 0 {
-			if !n.IsLeaf() {
+			if !n.HasValue() {
 				break
 			}
 			goto DELETE
@@ -319,7 +319,7 @@ DELETE:
 	}
 
 	// Check if we should merge the parent's other child
-	if parent != nil && parent != t.root && len(parent.edges) == 1 && !parent.IsLeaf() {
+	if parent != nil && parent != t.root && len(parent.edges) == 1 && !parent.HasValue() {
 		parent.mergeChild()
 	}
 
@@ -344,13 +344,13 @@ func (t *Tree) deletePrefix(parent, n *Node, prefix string) int {
 			subTreeSize++
 			return false
 		})
-		if n.IsLeaf() {
+		if n.HasValue() {
 			n.leaf = nil
 		}
 		n.edges = nil // deletes the entire subtree
 
 		// Check if we should merge the parent's other child
-		if parent != nil && parent != t.root && len(parent.edges) == 1 && !parent.IsLeaf() {
+		if parent != nil && parent != t.root && len(parent.edges) == 1 && !parent.HasValue() {
 			parent.mergeChild()
 		}
 		t.size -= subTreeSize
@@ -396,7 +396,7 @@ func (t *Tree) Find(parent *Node, s string) (isFound bool, prefixLen int, lastLe
 			break
 		}
 
-		if n.IsLeaf() {
+		if n.HasValue() {
 			lastLeafNode = n
 		}
 
@@ -443,7 +443,7 @@ func (t *Tree) Minimum() (string, interface{}, bool) {
 	n := t.root
 	prefix := ""
 	for {
-		if n.IsLeaf() {
+		if n.HasValue() {
 			return prefix, n.leaf.val, true
 		}
 		if len(n.edges) > 0 {
@@ -466,7 +466,7 @@ func (t *Tree) Maximum() (string, interface{}, bool) {
 			prefix += n.prefix
 			continue
 		}
-		if n.IsLeaf() {
+		if n.HasValue() {
 			return prefix, n.leaf.val, true
 		}
 		break
@@ -599,7 +599,7 @@ func (t *Tree) VisitValues(parent *Node, prefix string, fn func(key string, n *N
 	n := parent
 	key := prefix + n.prefix
 
-	if parent.IsLeaf() {
+	if parent.HasValue() {
 		err := fn(key, n)
 		if err != nil {
 			return fmt.Errorf("can't process node: %s", err)
