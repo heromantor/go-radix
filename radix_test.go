@@ -423,14 +423,17 @@ func TestVisit(t *testing.T) {
 func TestVisitValues(t *testing.T) {
 	r := New()
 
-	s := []string{"", "A", "AB"}
+	s := []string{"", "AZZ", "AZZB", "AZZBC1", "AZZBC2", "AZZBC3"}
 
 	for _, ss := range s {
 		r.Insert(ss, true)
 	}
 
+	find := "AZZBD"
+	_, prefixLen, _, ln := r.Find(r.Root(), find)
+
 	out := make([]string, 0)
-	err := r.VisitValues(r.Root(), "-", func(key string, n *Node) error {
+	err := r.VisitValues(ln, find[0:prefixLen], func(key string, n *Node) error {
 		out = append(out, key)
 		return nil
 	})
@@ -439,9 +442,10 @@ func TestVisitValues(t *testing.T) {
 	}
 
 	expected := []string{
-		"-",
-		"-A",
-		"-AB",
+		"AZZB",
+		"AZZBC1",
+		"AZZBC2",
+		"AZZBC3",
 	}
 	if !reflect.DeepEqual(out, expected) {
 		t.Fatalf("mis-match: %v %v", out, expected)

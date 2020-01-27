@@ -636,6 +636,11 @@ func (t *Tree) VisitNodes(n *Node, order VisitOrder, fn func(*Node) error) error
 
 // VisitValues visits all nodes with values
 func (t *Tree) VisitValues(parent *Node, prefix string, fn func(key string, n *Node) error) error {
+	return t.visitValuesRecursive(parent, prefix[0:len(prefix)-len(parent.prefix)], fn)
+}
+
+// visitValuesRecursive visits all nodes with values
+func (t *Tree) visitValuesRecursive(parent *Node, prefix string, fn func(key string, n *Node) error) error {
 	n := parent
 	key := prefix + n.prefix
 
@@ -647,7 +652,7 @@ func (t *Tree) VisitValues(parent *Node, prefix string, fn func(key string, n *N
 	}
 
 	for i := range n.edges {
-		err := t.VisitValues(n.edges[i].node, key, fn)
+		err := t.visitValuesRecursive(n.edges[i].node, key, fn)
 		if err != nil {
 			return fmt.Errorf("can't traverse inner nodes: %s", err)
 		}
