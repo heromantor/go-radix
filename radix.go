@@ -22,13 +22,18 @@ const (
 // be terminated.
 type WalkFn func(s string, v interface{}) bool
 
-// leafNode is used to represent a value
-type leafNode struct {
+// LeafNode is used to represent a value
+type LeafNode struct {
 	val interface{}
 }
 
+// NewLeafNode конструктор
+func NewLeafNode(val interface{}) *LeafNode {
+	return &LeafNode{val: val}
+}
+
 // Value returns value stored in node
-func (l *leafNode) Value() interface{} {
+func (l *LeafNode) Value() interface{} {
 	return l.val
 }
 
@@ -55,7 +60,7 @@ func (e *Edge) Node() *Node {
 
 type Node struct {
 	// leaf is used to store possible leaf
-	leaf *leafNode
+	leaf *LeafNode
 
 	// prefix is the common prefix we ignore
 	prefix string
@@ -67,7 +72,7 @@ type Node struct {
 }
 
 // NewNode конструктор
-func NewNode(leaf *leafNode, prefix string, edges Edges) *Node {
+func NewNode(leaf *LeafNode, prefix string, edges Edges) *Node {
 	return &Node{leaf: leaf, prefix: prefix, edges: edges}
 }
 
@@ -223,7 +228,7 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 				return old, true
 			}
 
-			n.leaf = &leafNode{
+			n.leaf = &LeafNode{
 				val: v,
 			}
 			t.size++
@@ -239,7 +244,7 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 			e := Edge{
 				label: search[0],
 				node: &Node{
-					leaf: &leafNode{
+					leaf: &LeafNode{
 						val: v,
 					},
 					prefix: search,
@@ -272,7 +277,7 @@ func (t *Tree) Insert(s string, v interface{}) (interface{}, bool) {
 		n.prefix = n.prefix[commonPrefix:]
 
 		// Create a new leaf node
-		leaf := &leafNode{
+		leaf := &LeafNode{
 			val: v,
 		}
 
