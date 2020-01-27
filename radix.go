@@ -38,6 +38,11 @@ type Edge struct {
 	node  *Node
 }
 
+// NewEdge конструктор
+func NewEdge(label byte, node *Node) *Edge {
+	return &Edge{label: label, node: node}
+}
+
 // Label return label for Edge
 func (e *Edge) Label() byte {
 	return e.label
@@ -59,6 +64,11 @@ type Node struct {
 	// We avoid a fully materialized slice to save memory,
 	// since in most cases we expect to be sparse
 	edges Edges
+}
+
+// NewNode конструктор
+func NewNode(leaf *leafNode, prefix string, edges Edges) *Node {
+	return &Node{leaf: leaf, prefix: prefix, edges: edges}
 }
 
 func (n *Node) Prefix() string {
