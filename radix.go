@@ -162,6 +162,11 @@ func New() *Tree {
 	return NewFromMap(nil)
 }
 
+// NewFromRoot returns Tree from root node
+func NewFromRoot(root *Node) *Tree {
+	return &Tree{root: root}
+}
+
 // NewFromMap returns a new tree containing the keys
 // from an existing map
 func NewFromMap(m map[string]interface{}) *Tree {
