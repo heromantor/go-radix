@@ -433,7 +433,7 @@ func TestVisitValues(t *testing.T) {
 	_, prefixLen, _, ln := r.Find(r.Root(), find)
 
 	out := make([]string, 0)
-	err := r.VisitValues(ln, find[0:prefixLen], func(key string, n *Node) error {
+	err := r.VisitValues(ln, find[0:prefixLen-len(ln.Prefix())], func(key string, n *Node) error {
 		out = append(out, key)
 		return nil
 	})
