@@ -1,7 +1,7 @@
 package radix
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 	"sort"
 	"strings"
 )
@@ -613,21 +613,21 @@ func (t *Tree) VisitNodes(n *Node, order VisitOrder, fn func(*Node) error) error
 	if order == VisitOrderTopDown {
 		err := fn(n)
 		if err != nil {
-			return fmt.Errorf("can't process node: %s", err)
+			return errors.Wrap(err, "can't process node")
 		}
 	}
 
 	for i := range n.edges {
 		err := t.VisitNodes(n.edges[i].node, order, fn)
 		if err != nil {
-			return fmt.Errorf("can't traverse inner nodes: %s", err)
+			return errors.Wrap(err, "can't traverse inner nodes")
 		}
 	}
 
 	if order == VisitOrderDownTop {
 		err := fn(n)
 		if err != nil {
-			return fmt.Errorf("can't process node: %s", err)
+			return errors.Wrap(err, "can't process node")
 		}
 	}
 
@@ -647,14 +647,14 @@ func (t *Tree) visitValuesRecursive(parent *Node, prefix string, fn func(key str
 	if parent.HasValue() {
 		err := fn(key, n)
 		if err != nil {
-			return fmt.Errorf("can't process node: %s", err)
+			return errors.Wrap(err, "can't process node")
 		}
 	}
 
 	for i := range n.edges {
 		err := t.visitValuesRecursive(n.edges[i].node, key, fn)
 		if err != nil {
-			return fmt.Errorf("can't traverse inner nodes: %s", err)
+			return errors.Wrap(err, "can't traverse inner nodes")
 		}
 	}
 
