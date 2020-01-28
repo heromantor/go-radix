@@ -635,8 +635,8 @@ func (t *Tree) VisitNodes(n *Node, order VisitOrder, fn func(*Node) error) error
 }
 
 // VisitValues visits all nodes with values
-func (t *Tree) VisitValues(parent *Node, prefix string, fn func(key string, n *Node) error) error {
-	return t.visitValuesRecursive(parent, prefix, fn)
+func (t *Tree) VisitValues(parent *Node, fn func(key string, n *Node) error) error {
+	return t.visitValuesRecursive(parent, "", fn)
 }
 
 // visitValuesRecursive visits all nodes with values
